@@ -42,40 +42,40 @@ export const IdentificationTypes = [
 
 export const Doctors = [
   {
-    image: "/assets/images/dr-green.png",
-    name: "John Green",
+    image: "/assets/images/r.png",
+    name: "Dr Rizwan - ENT Specialist",
   },
   {
-    image: "/assets/images/dr-cameron.png",
-    name: "Leila Cameron",
+    image: "/assets/images/m.png",
+    name: "Dr Mubeen - Cardiologist",
   },
   {
-    image: "/assets/images/dr-livingston.png",
-    name: "David Livingston",
+    image: "/assets/images/s.png",
+    name: "Dr Shahzeb - Dermatologist",
+  },
+  {
+    image: "/assets/images/a.png",
+    name: "Dr Arsalan - Orthopedic Surgeon",
+  },
+  {
+    image: "/assets/images/f.png",
+    name: "Dr Faraz - Pediatrician",
+  },
+  {
+    image: "/assets/images/w.png",
+    name: "Dr Riaz - General Physician",
+  },
+  {
+    image: "/assets/images/n.png",
+    name: "Dr johny - Neurologist",
+  },
+  {
+    image: "/assets/images/q.png",
+    name: "Dr Qadeer - Ophthalmologist",
   },
   {
     image: "/assets/images/dr-peter.png",
-    name: "Evan Peter",
-  },
-  {
-    image: "/assets/images/dr-powell.png",
-    name: "Jane Powell",
-  },
-  {
-    image: "/assets/images/dr-remirez.png",
-    name: "Alex Ramirez",
-  },
-  {
-    image: "/assets/images/dr-lee.png",
-    name: "Jasmine Lee",
-  },
-  {
-    image: "/assets/images/dr-cruz.png",
-    name: "Alyana Cruz",
-  },
-  {
-    image: "/assets/images/dr-sharma.png",
-    name: "Hardik Sharma",
+    name: "Dr Naveed - Oncologist",
   },
 ];
 
