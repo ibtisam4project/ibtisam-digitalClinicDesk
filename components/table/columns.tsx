@@ -18,13 +18,18 @@ export const columns: ColumnDef<Appointment>[] = [
     },
   },
   {
-    accessorKey: "patient",
-    header: "Patient",
-    cell: ({ row }) => {
-      const appointment = row.original;
-      return <p className="text-14-medium ">{appointment.patient.name}</p>;
-    },
+  accessorKey: "patient",
+  header: "Patient",
+  cell: ({ row }) => {
+    const appointment = row.original;
+    return (
+      <p className="text-14-medium">
+        {appointment.patient?.name ?? "N/A"}
+      </p>
+    );
   },
+},
+
   {
     accessorKey: "status",
     header: "Status",
@@ -73,32 +78,36 @@ export const columns: ColumnDef<Appointment>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    header: () => <div className="pl-4">Actions</div>,
-    cell: ({ row }) => {
-      const appointment = row.original;
+ {
+  id: "actions",
+  header: () => <div className="pl-4">Actions</div>,
+  cell: ({ row }) => {
+    const appointment = row.original;
 
-      return (
-        <div className="flex gap-1">
-          <AppointmentModal
-            patientId={appointment.patient.$id}
-            userId={appointment.userId}
-            appointment={appointment}
-            type="schedule"
-            title="Schedule Appointment"
-            description="Please confirm the following details to schedule."
-          />
-          <AppointmentModal
-            patientId={appointment.patient.$id}
-            userId={appointment.userId}
-            appointment={appointment}
-            type="cancel"
-            title="Cancel Appointment"
-            description="Are you sure you want to cancel your appointment?"
-          />
-        </div>
-      );
-    },
+    // 🚨 Prevent crash if patient is null
+    if (!appointment.patient) return null;
+
+    return (
+      <div className="flex gap-1">
+        <AppointmentModal
+          patientId={appointment.patient.$id}
+          userId={appointment.userId}
+          appointment={appointment}
+          type="schedule"
+          title="Schedule Appointment"
+          description="Please confirm the following details to schedule."
+        />
+        <AppointmentModal
+          patientId={appointment.patient.$id}
+          userId={appointment.userId}
+          appointment={appointment}
+          type="cancel"
+          title="Cancel Appointment"
+          description="Are you sure you want to cancel your appointment?"
+        />
+      </div>
+    );
   },
+},
+
 ];
