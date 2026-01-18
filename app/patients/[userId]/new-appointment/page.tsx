@@ -1,10 +1,13 @@
+// app/patients/[userId]/new-appointment/page.tsx
 import Image from "next/image";
 
 import { AppointmentForm } from "@/components/forms/AppointmentForm";
 import { getPatient } from "@/lib/actions/patient.actions";
+import { getDoctors } from "@/lib/actions/doctor.actions";
 
 const Appointment = async ({ params: { userId } }: SearchParamProps) => {
   const patient = await getPatient(userId);
+  const doctors = await getDoctors();
 
   return (
     <div className="flex h-screen max-h-screen">
@@ -15,16 +18,17 @@ const Appointment = async ({ params: { userId } }: SearchParamProps) => {
             height={1000}
             width={1000}
             alt="logo"
-            className="mb-12 h-39 w-fit"
+            className="mb-12 h-10 w-fit"
           />
 
           <AppointmentForm
             patientId={patient?.$id}
             userId={userId}
             type="create"
+            doctors={doctors}
           />
 
-          <p className="copyright mt-10 py-12">© 2025 Ibtisam Haq</p>
+          <p className="copyright mt-10 py-12">© 2025 Digital Clinic Desk</p>
         </div>
       </section>
 

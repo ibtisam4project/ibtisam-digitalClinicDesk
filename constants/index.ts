@@ -40,7 +40,7 @@ export const IdentificationTypes = [
   "Voter ID Card",
 ];
 
-export const Doctors = [
+/*export const Doctors = [
   {
     image: "/assets/images/r.png",
     name: "Dr Rizwan - ENT Specialist",
@@ -78,7 +78,7 @@ export const Doctors = [
     name: "Dr Naveed - Oncologist",
   },
 ];
-
+*/
 export const StatusIcon = {
   scheduled: "/assets/icons/check.svg",
   pending: "/assets/icons/pending.svg",

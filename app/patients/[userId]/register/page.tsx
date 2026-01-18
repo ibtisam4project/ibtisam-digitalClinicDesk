@@ -1,12 +1,15 @@
+// app/patients/[userId]/register/page.tsx
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import RegisterForm from "@/components/forms/RegisterForm";
 import { getPatient, getUser } from "@/lib/actions/patient.actions";
+import { getDoctors } from "@/lib/actions/doctor.actions";
 
 const Register = async ({ params: { userId } }: SearchParamProps) => {
   const user = await getUser(userId);
   const patient = await getPatient(userId);
+  const doctors = await getDoctors(); // Fetch doctors from Appwrite
 
   if (patient) redirect(`/patients/${userId}/new-appointment`);
 
@@ -22,7 +25,7 @@ const Register = async ({ params: { userId } }: SearchParamProps) => {
             className="mb-12 h-10 w-fit"
           />
 
-          <RegisterForm user={user} />
+          <RegisterForm user={user} doctors={doctors} />
 
           <p className="copyright py-12">© 2025 Ibtisam</p>
         </div>

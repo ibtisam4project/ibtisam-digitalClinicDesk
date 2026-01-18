@@ -1,13 +1,13 @@
 "use client";
-
+import { AppointmentModalWrapper } from "../AppointmentModalWrapper";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
-import { Doctors } from "@/constants";
 import { formatDateTime } from "@/lib/utils";
 import { Appointment } from "@/types/appwrite.types";
 
 import { AppointmentModal } from "../AppointmentModal";
+import { PaymentConfirmationModal } from "../PaymentConfirmationModal";
 import { StatusBadge } from "../StatusBadge";
 
 export const columns: ColumnDef<Appointment>[] = [
@@ -18,18 +18,17 @@ export const columns: ColumnDef<Appointment>[] = [
     },
   },
   {
-  accessorKey: "patient",
-  header: "Patient",
-  cell: ({ row }) => {
-    const appointment = row.original;
-    return (
-      <p className="text-14-medium">
-        {appointment.patient?.name ?? "N/A"}
-      </p>
-    );
+    accessorKey: "patient",
+    header: "Patient",
+    cell: ({ row }) => {
+      const appointment = row.original;
+      return (
+        <p className="text-14-medium">
+          {appointment.patient?.name ?? "N/A"}
+        </p>
+      );
+    },
   },
-},
-
   {
     accessorKey: "status",
     header: "Status",
@@ -59,55 +58,73 @@ export const columns: ColumnDef<Appointment>[] = [
     header: "Doctor",
     cell: ({ row }) => {
       const appointment = row.original;
-
-      const doctor = Doctors.find(
-        (doctor) => doctor.name === appointment.primaryPhysician
-      );
-
       return (
         <div className="flex items-center gap-3">
-          <Image
-            src={doctor?.image!}
-            alt="doctor"
-            width={100}
-            height={100}
-            className="size-8"
-          />
-          <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+          <p className="whitespace-nowrap">Dr. {appointment.primaryPhysician}</p>
         </div>
       );
     },
   },
- {
-  id: "actions",
-  header: () => <div className="pl-4">Actions</div>,
-  cell: ({ row }) => {
-    const appointment = row.original;
+  {
+    accessorKey: "paymentMethod",
+    header: "Payment",
+    cell: ({ row }) => {
+      const appointment = row.original;
+      
+      const paymentIcons: any = {
+        cash: "💵",
+        easypaisa: "📱",
+        jazzcash: "📱",
+        bank: "🏦",
+      };
 
-    // 🚨 Prevent crash if patient is null
-    if (!appointment.patient) return null;
-
-    return (
-      <div className="flex gap-1">
-        <AppointmentModal
-          patientId={appointment.patient.$id}
-          userId={appointment.userId}
-          appointment={appointment}
-          type="schedule"
-          title="Schedule Appointment"
-          description="Please confirm the following details to schedule."
-        />
-        <AppointmentModal
-          patientId={appointment.patient.$id}
-          userId={appointment.userId}
-          appointment={appointment}
-          type="cancel"
-          title="Cancel Appointment"
-          description="Are you sure you want to cancel your appointment?"
-        />
-      </div>
-    );
+      return (
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span>{paymentIcons[appointment.paymentMethod] || "💳"}</span>
+            <p className="text-14-medium capitalize">
+              {appointment.paymentMethod || "N/A"}
+            </p>
+          </div>
+          {appointment.paymentAmount && (
+            <p className="text-12-regular text-dark-600">
+              Rs. {appointment.paymentAmount}
+            </p>
+          )}
+        </div>
+      );
+    },
   },
-},
+  {
+    id: "actions",
+    header: () => <div className="pl-4">Actions</div>,
+    cell: ({ row }) => {
+      const appointment = row.original;
+      if (!appointment.patient) return null;
 
+      return (
+        <div className="flex gap-1">
+          <AppointmentModalWrapper
+              patientId={appointment.patient.$id}
+              userId={appointment.userId}
+              appointment={appointment}
+              type="schedule"
+              title="Schedule Appointment"
+              description="Please confirm the following details to schedule."
+            />
+            <AppointmentModalWrapper
+              patientId={appointment.patient.$id}
+              userId={appointment.userId}
+              appointment={appointment}
+              type="cancel"
+              title="Cancel Appointment"
+              description="Are you sure you want to cancel your appointment?"
+            />
+          {appointment.paymentMethod && (
+            <PaymentConfirmationModal appointment={appointment} />
+          )}
+        </div>
+      );
+    },
+  },
 ];

@@ -55,3 +55,17 @@ declare type UpdateAppointmentParams = {
   appointment: Appointment;
   type: string;
 };
+
+interface CreateAppointmentParams {
+  userId: string;
+  patient: string;
+  primaryPhysician: string;
+  doctorId: string;
+  schedule: Date;
+  appointmentDate: Date; // Add this
+  reason: string;
+  status: Status;
+  note?: string;
+  paymentMethod?: string;
+  paymentAmount?: number;
+}

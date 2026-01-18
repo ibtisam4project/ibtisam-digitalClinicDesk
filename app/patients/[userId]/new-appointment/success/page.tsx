@@ -1,9 +1,10 @@
+// app/patients/[userId]/new-appointment/success/page.tsx
 import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Doctors } from "@/constants";
 import { getAppointment } from "@/lib/actions/appointment.actions";
+import { getDoctors } from "@/lib/actions/doctor.actions";
 import { formatDateTime } from "@/lib/utils";
 
 const RequestSuccess = async ({
@@ -12,13 +13,15 @@ const RequestSuccess = async ({
 }: SearchParamProps) => {
   const appointmentId = (searchParams?.appointmentId as string) || "";
   const appointment = await getAppointment(appointmentId);
+  const doctors = await getDoctors(); // Fetch doctors from Appwrite
 
-  const doctor = Doctors.find(
-    (doctor) => doctor.name === appointment.primaryPhysician
+  // Find the doctor from Appwrite database
+  const doctor = doctors.find(
+    (doc: any) => doc.name === appointment.primaryPhysician
   );
 
   return (
-    <div className=" flex h-screen max-h-screen px-[5%]">
+    <div className="flex h-screen max-h-screen px-[5%]">
       <div className="success-img">
         <Link href="/">
           <Image
@@ -47,14 +50,16 @@ const RequestSuccess = async ({
         <section className="request-details">
           <p>Requested appointment details: </p>
           <div className="flex items-center gap-3">
-            <Image
-              src={doctor?.image!}
-              alt="doctor"
-              width={100}
-              height={100}
-              className="size-6"
-            />
-            <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+            {doctor?.image && (
+              <Image
+                src={doctor.image}
+                alt="doctor"
+                width={100}
+                height={100}
+                className="size-6 rounded-full object-cover"
+              />
+            )}
+            <p className="whitespace-nowrap">Dr. {doctor?.name || appointment.primaryPhysician}</p>
           </div>
           <div className="flex gap-2">
             <Image
@@ -63,7 +68,7 @@ const RequestSuccess = async ({
               width={24}
               alt="calendar"
             />
-            <p> {formatDateTime(appointment.schedule).dateTime}</p>
+            <p>{formatDateTime(appointment.schedule).dateTime}</p>
           </div>
         </section>
 

@@ -1,3 +1,4 @@
+//components/forms/RegisterForm.tsx
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SelectItem } from "@/components/ui/select";
 import {
-  Doctors,
   GenderOptions,
   IdentificationTypes,
   PatientFormDefaultValues,
@@ -26,7 +26,12 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import { FileUploader } from "../FileUploader";
 import SubmitButton from "../SubmitButton";
 
-const RegisterForm = ({ user }: { user: User }) => {
+interface RegisterFormProps {
+  user: User;
+  doctors: any[];
+}
+
+const RegisterForm = ({ user, doctors }: RegisterFormProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +48,6 @@ const RegisterForm = ({ user }: { user: User }) => {
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
 
-    // Store file info in form data as
     let formData;
     if (
       values.identificationDocument &&
@@ -113,8 +117,6 @@ const RegisterForm = ({ user }: { user: User }) => {
             <h2 className="sub-header">Personal Information</h2>
           </div>
 
-          {/* NAME */}
-
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
@@ -124,7 +126,6 @@ const RegisterForm = ({ user }: { user: User }) => {
             iconAlt="user"
           />
 
-          {/* EMAIL & PHONE */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.INPUT}
@@ -145,7 +146,6 @@ const RegisterForm = ({ user }: { user: User }) => {
             />
           </div>
 
-          {/* BirthDate & Gender */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.DATE_PICKER}
@@ -180,7 +180,6 @@ const RegisterForm = ({ user }: { user: User }) => {
             />
           </div>
 
-          {/* Address & Occupation */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.INPUT}
@@ -199,7 +198,6 @@ const RegisterForm = ({ user }: { user: User }) => {
             />
           </div>
 
-          {/* Emergency Contact Name & Emergency Contact Number */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.INPUT}
@@ -224,31 +222,39 @@ const RegisterForm = ({ user }: { user: User }) => {
             <h2 className="sub-header">Medical Information</h2>
           </div>
 
-          {/* PRIMARY CARE PHYSICIAN */}
-          <CustomFormField
-            fieldType={FormFieldType.SELECT}
-            control={form.control}
-            name="primaryPhysician"
-            label="Primary care physician"
-            placeholder="Select a physician"
-          >
-            {Doctors.map((doctor, i) => (
-              <SelectItem key={doctor.name + i} value={doctor.name}>
-                <div className="flex cursor-pointer items-center gap-2">
-                  <Image
-                    src={doctor.image}
-                    width={32}
-                    height={32}
-                    alt="doctor"
-                    className="rounded-full border border-dark-500"
-                  />
-                  <p>{doctor.name}</p>
-                </div>
-              </SelectItem>
-            ))}
-          </CustomFormField>
+          {/* Add this safety check in the PRIMARY CARE PHYSICIAN section */}
+                <CustomFormField
+                  fieldType={FormFieldType.SELECT}
+                  control={form.control}
+                  name="primaryPhysician"
+                  label="Primary care physician"
+                  placeholder="Select a physician"
+                >
+                  {doctors && doctors.length > 0 ? (
+                    doctors.map((doctor) => (
+                      <SelectItem key={doctor.$id} value={doctor.name}>
+                        <div className="flex cursor-pointer items-center gap-2">
+                          <Image
+                            src={doctor.image}
+                            width={32}
+                            height={32}
+                            alt={doctor.name}
+                            className="rounded-full border border-dark-500"
+                          />
+                          <p>Dr. {doctor.name}</p>
+                        </div>
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-doctors" disabled>
+                      <p className="text-dark-600">
+                        No doctors available. Please contact admin.
+                      </p>
+                    </SelectItem>
+                  )}
+                </CustomFormField>
 
-          {/* INSURANCE & POLICY NUMBER */}
+
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.INPUT}
@@ -267,7 +273,6 @@ const RegisterForm = ({ user }: { user: User }) => {
             />
           </div>
 
-          {/* ALLERGY & CURRENT MEDICATIONS */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.TEXTAREA}
@@ -286,7 +291,6 @@ const RegisterForm = ({ user }: { user: User }) => {
             />
           </div>
 
-          {/* FAMILY MEDICATION & PAST MEDICATIONS */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.TEXTAREA}

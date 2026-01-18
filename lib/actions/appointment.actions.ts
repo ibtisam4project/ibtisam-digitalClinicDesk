@@ -18,17 +18,28 @@ export const createAppointment = async (
   appointment: CreateAppointmentParams
 ) => {
   try {
+    // Ensure appointmentDate is included
+    const appointmentData = {
+      ...appointment,
+      appointmentDate: appointment.schedule, // Add this mapping
+    };
+    
+    // Log the appointment data being sent
+    console.log("Creating appointment with data:", appointmentData);
+    
     const newAppointment = await databases.createDocument(
       DATABASE_ID!,
       APPOINTMENT_COLLECTION_ID!,
       ID.unique(),
-      appointment
+      appointmentData
     );
 
     revalidatePath("/admin");
     return parseStringify(newAppointment);
-  } catch (error) {
+  } catch (error: any) {
     console.error("An error occurred while creating a new appointment:", error);
+    console.error("Error details:", error.message, error.type, error.code);
+    throw error;
   }
 };
 
@@ -40,26 +51,6 @@ export const getRecentAppointmentList = async () => {
       APPOINTMENT_COLLECTION_ID!,
       [Query.orderDesc("$createdAt")]
     );
-
-    // const scheduledAppointments = (
-    //   appointments.documents as Appointment[]
-    // ).filter((appointment) => appointment.status === "scheduled");
-
-    // const pendingAppointments = (
-    //   appointments.documents as Appointment[]
-    // ).filter((appointment) => appointment.status === "pending");
-
-    // const cancelledAppointments = (
-    //   appointments.documents as Appointment[]
-    // ).filter((appointment) => appointment.status === "cancelled");
-
-    // const data = {
-    //   totalCount: appointments.total,
-    //   scheduledCount: scheduledAppointments.length,
-    //   pendingCount: pendingAppointments.length,
-    //   cancelledCount: cancelledAppointments.length,
-    //   documents: appointments.documents,
-    // };
 
     const initialCounts = {
       scheduledCount: 0,
@@ -103,7 +94,6 @@ export const getRecentAppointmentList = async () => {
 //  SEND SMS NOTIFICATION
 export const sendSMSNotification = async (userId: string, content: string) => {
   try {
-    // https://appwrite.io/docs/references/1.5.x/server-nodejs/messaging#createSms
     const message = await messaging.createSms(
       ID.unique(),
       content,
@@ -125,12 +115,17 @@ export const updateAppointment = async ({
   type,
 }: UpdateAppointmentParams) => {
   try {
-    // Update appointment to scheduled -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#updateDocument
+    // Ensure appointmentDate is included when updating
+    const appointmentData = {
+      ...appointment,
+      ...(appointment.schedule && { appointmentDate: appointment.schedule }),
+    };
+
     const updatedAppointment = await databases.updateDocument(
       DATABASE_ID!,
       APPOINTMENT_COLLECTION_ID!,
       appointmentId,
-      appointment
+      appointmentData
     );
 
     if (!updatedAppointment) throw Error;

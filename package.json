@@ -32,6 +32,7 @@
     "next": "14.2.3",
     "next-themes": "^0.3.0",
     "node-appwrite": "^12.0.1",
+    "packages": "^0.0.8",
     "prettier": "^3.2.5",
     "react": "^18",
     "react-datepicker": "^6.9.0",

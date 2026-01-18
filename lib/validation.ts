@@ -1,54 +1,67 @@
+// lib/validation.ts
 import { z } from "zod";
 
+// Name validation - only letters and spaces
+const nameValidation = z
+  .string()
+  .min(2, "Name must be at least 2 characters")
+  .max(50, "Name must be less than 50 characters")
+  .regex(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces");
+
+// Pakistani phone number validation - accepts multiple formats
+const phoneValidation = z
+  .string()
+  .refine(
+    (phone) => {
+      // Remove all spaces, dashes, and parentheses
+      const cleaned = phone.replace(/[\s\-\(\)]/g, "");
+      
+      // Accept formats:
+      // +923001234567 (with +92)
+      // 923001234567 (without +)
+      // 03001234567 (without country code)
+      return (
+        /^\+92\d{10}$/.test(cleaned) || // +92 followed by 10 digits
+        /^92\d{10}$/.test(cleaned) ||   // 92 followed by 10 digits
+        /^03\d{9}$/.test(cleaned)        // 03 followed by 9 digits
+      );
+    },
+    {
+      message: "Invalid phone number. Use: +92 3XX XXXXXXX or 03XX XXXXXXX",
+    }
+  );
+
 export const UserFormValidation = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be at most 50 characters"),
+  name: nameValidation,
   email: z.string().email("Invalid email address"),
-  phone: z
-    .string()
-    .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
+  phone: phoneValidation,
 });
 
 export const PatientFormValidation = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be at most 50 characters"),
+  name: nameValidation,
   email: z.string().email("Invalid email address"),
-  phone: z
-    .string()
-    .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
+  phone: phoneValidation,
   birthDate: z.coerce.date(),
-  gender: z.enum(["Male", "Female", "Other"]),
+  gender: z.enum(["Male", "Female"]),
   address: z
     .string()
     .min(5, "Address must be at least 5 characters")
-    .max(500, "Address must be at most 500 characters"),
+    .max(500, "Address must be less than 500 characters"),
   occupation: z
     .string()
     .min(2, "Occupation must be at least 2 characters")
-    .max(500, "Occupation must be at most 500 characters"),
-  emergencyContactName: z
-    .string()
-    .min(2, "Contact name must be at least 2 characters")
-    .max(50, "Contact name must be at most 50 characters"),
-  emergencyContactNumber: z
-    .string()
-    .refine(
-      (emergencyContactNumber) => /^\+\d{10,15}$/.test(emergencyContactNumber),
-      "Invalid phone number"
-    ),
+    .max(500, "Occupation must be less than 500 characters"),
+  emergencyContactName: nameValidation,
+  emergencyContactNumber: phoneValidation,
   primaryPhysician: z.string().min(2, "Select at least one doctor"),
   insuranceProvider: z
     .string()
-    .min(2, "Insurance name must be at least 2 characters")
-    .max(50, "Insurance name must be at most 50 characters"),
+    .min(2, "Insurance provider name must be at least 2 characters")
+    .max(50, "Insurance provider name must be less than 50 characters"),
   insurancePolicyNumber: z
     .string()
     .min(2, "Policy number must be at least 2 characters")
-    .max(50, "Policy number must be at most 50 characters"),
+    .max(50, "Policy number must be less than 50 characters"),
   allergies: z.string().optional(),
   currentMedication: z.string().optional(),
   familyMedicalHistory: z.string().optional(),
@@ -82,9 +95,14 @@ export const CreateAppointmentSchema = z.object({
   reason: z
     .string()
     .min(2, "Reason must be at least 2 characters")
-    .max(500, "Reason must be at most 500 characters"),
+    .max(500, "Reason must be less than 500 characters"),
   note: z.string().optional(),
   cancellationReason: z.string().optional(),
+  paymentMethod: z.enum(["cash", "easypaisa", "jazzcash", "bank"], {
+    required_error: "Please select a payment method",
+  }),
+  paymentAmount: z.number().min(100, "Minimum payment amount is Rs. 100"),
+  transactionId: z.string().optional(),
 });
 
 export const ScheduleAppointmentSchema = z.object({
@@ -103,7 +121,7 @@ export const CancelAppointmentSchema = z.object({
   cancellationReason: z
     .string()
     .min(2, "Reason must be at least 2 characters")
-    .max(500, "Reason must be at most 500 characters"),
+    .max(500, "Reason must be less than 500 characters"),
 });
 
 export function getAppointmentSchema(type: string) {
